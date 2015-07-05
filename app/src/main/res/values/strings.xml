@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Stay63</string>
+    <string name="title_activity_landing">Nearest stops</string>
+    <string name="current_postition">You</string>
+    <string name="title_activity_stop_info">Nearest stops</string>
+    <string name="bus_number_title">Автобус %s</string>
+    <string name="time_arrived_pattern">Через %s минут</string>
+</resources>
