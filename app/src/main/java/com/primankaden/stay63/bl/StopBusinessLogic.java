@@ -1,6 +1,7 @@
 package com.primankaden.stay63.bl;
 
 import android.location.Location;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.primankaden.stay63.XmlUtils;
@@ -10,6 +11,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -35,7 +37,7 @@ public class StopBusinessLogic {
     }
 
     public List<FullStop> getNearestStops(int count) {
-        List<FullStop> result = new ArrayList<FullStop>();
+        List<FullStop> result = new ArrayList<>();
         List<FullStop> list = getAllFullStops();
         sortByLocation(list, GeoBusinessLogic.getInstance().getLastKnownLocation());
         for (int i = 0; i < count && i < list.size(); i++) {
@@ -44,19 +46,36 @@ public class StopBusinessLogic {
         return result;
     }
 
+    @NonNull
     public List<FullStop> getAllFullStops() {
         syncFullStopList();
-        return repository.getFullStopList();
+        List<FullStop> result = repository.getFullStopList();
+        if (result == null) {
+            result = new ArrayList<>();
+        }
+        return result;
     }
 
-    public void syncFullStopList() {
+    public synchronized void syncFullStopList() {
         if (isFullStopSynced()) {
             Log.d(TAG, "sync canceled");
             return;
         }
         List<FullStop> list = new ArrayList<>();
-        String stopsXml = PublicAPI.getXml(PublicAPI.CLASSIFIER_FULL_STOPS);
-        Document doc = XmlUtils.getDomElement(stopsXml);
+        String stopsXml;
+        try {
+            stopsXml = PublicAPI.getXml(PublicAPI.CLASSIFIER_FULL_STOPS);
+        } catch (IOException e) {
+            Log.w(TAG, "Connection error " + e.getLocalizedMessage());
+            return;
+        }
+        Document doc;
+        try {
+            doc = XmlUtils.getDomElement(stopsXml);
+        } catch (Exception e) {
+            Log.w(TAG, "Parse exception " + e.getLocalizedMessage());
+            return;
+        }
         if (doc != null) {
             NodeList nl = doc.getElementsByTagName("stop");
             for (int i = 0; i < nl.getLength(); i++) {

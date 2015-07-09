@@ -1,7 +1,6 @@
 package com.primankaden.stay63.bl;
 
 import com.primankaden.stay63.entities.FullStop;
-import com.primankaden.stay63.entities.Stop;
 
 import java.util.ArrayList;
 import java.util.Date;

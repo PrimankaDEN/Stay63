@@ -1,7 +1,5 @@
 package com.primankaden.stay63;
 
-import android.util.Log;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -17,29 +15,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 public class XmlUtils {
-    public static Document getDomElement(String xml) {
-        Document doc = null;
+    public static Document getDomElement(String xml) throws IOException, SAXException, ParserConfigurationException {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        try {
-
-            DocumentBuilder db = dbf.newDocumentBuilder();
-
-            InputSource is = new InputSource();
-            is.setCharacterStream(new StringReader(xml));
-            doc = db.parse(is);
-
-        } catch (ParserConfigurationException e) {
-            Log.e("Error: ", e.getMessage());
-            return null;
-        } catch (SAXException e) {
-            Log.e("Error: ", e.getMessage());
-            return null;
-        } catch (IOException e) {
-            Log.e("Error: ", e.getMessage());
-            return null;
-        }
-        // return DOM
-        return doc;
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        InputSource is = new InputSource();
+        is.setCharacterStream(new StringReader(xml));
+        return db.parse(is);
     }
 
     public static String getValue(Element item, String str) {

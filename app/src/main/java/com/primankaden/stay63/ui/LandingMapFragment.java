@@ -35,6 +35,7 @@ public class LandingMapFragment extends MapFragment implements OnMapReadyCallbac
     private static final float MAP_SCALE = 14;
     private static final int STOPS_COUNT = 10;
     private List<FullStop> list = new ArrayList<>();
+    protected static final String YOU_MARKER_ID = "You position";
 
     @AfterViews
     protected void init() {
@@ -67,10 +68,10 @@ public class LandingMapFragment extends MapFragment implements OnMapReadyCallbac
         googleMap.clear();
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentCoords, MAP_SCALE));
         googleMap.addMarker(new MarkerOptions().title(getActivity().getString(R.string.current_postition)).position(currentCoords).icon(BitmapDescriptorFactory
-                .defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+                .defaultMarker(BitmapDescriptorFactory.HUE_BLUE)).snippet(YOU_MARKER_ID));
         for (FullStop stop : list) {
             googleMap.addMarker(new MarkerOptions().title(stop.getTitle()).position(stop.getLatLng()).icon(BitmapDescriptorFactory
-                    .defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                    .defaultMarker(BitmapDescriptorFactory.HUE_RED)).snippet(stop.getId()));
         }
     }
 

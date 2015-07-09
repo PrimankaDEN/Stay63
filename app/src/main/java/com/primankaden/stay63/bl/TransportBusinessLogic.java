@@ -3,13 +3,13 @@ package com.primankaden.stay63.bl;
 import android.util.Log;
 
 import com.primankaden.stay63.XmlUtils;
-import com.primankaden.stay63.entities.FullStop;
 import com.primankaden.stay63.entities.Transport;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -38,13 +38,25 @@ public class TransportBusinessLogic {
         return repository.getByStopId(stopId);
     }
 
-    private void syncTransportList(String stopId) {
+    private synchronized void syncTransportList(String stopId) {
         if (isSynced(stopId)) {
             Log.d(TAG, "sync canceled");
             return;
         }
-        String response = PublicAPI.getTransportXml(stopId, 10);
-        Document doc = XmlUtils.getDomElement(response);
+        String response;
+        try {
+            response = PublicAPI.getTransportXml(stopId, 10);
+        } catch (IOException e) {
+            Log.w(TAG, e.getLocalizedMessage());
+            return;
+        }
+        Document doc;
+        try {
+            doc = XmlUtils.getDomElement(response);
+        } catch (Exception e) {
+            Log.w(TAG, "Parse error " + e.getLocalizedMessage());
+            return;
+        }
         List<Transport> list = new ArrayList<>();
         if (doc != null) {
             NodeList nl = doc.getElementsByTagName("transport");
@@ -55,7 +67,7 @@ public class TransportBusinessLogic {
             }
         }
         repository.setByStopId(stopId, list);
-
+        Log.d(TAG, "sync complete");
     }
 
     public boolean isSynced(String stopId) {

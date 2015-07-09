@@ -16,21 +16,19 @@ import java.util.List;
 @EFragment
 public class FullScreenMapFragment extends LandingMapFragment {
     private static final int STOPS_COUNT = 25;
-    private Marker lastClicked = null;
+    private String lastClickedId = "";
 
     @Override
     protected void changeMapSettings(GoogleMap map) {
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                //TODO how to identify markers?
-                //TODO start activity after second tap
-                if (marker == lastClicked) {
-                    StopInfoActivity.startMe(FullScreenMapFragment.this.getActivity(), "");
+                if (lastClickedId.equals(marker.getSnippet()) && !YOU_MARKER_ID.equals(marker.getSnippet())) {
+                    StopInfoActivity.startMe(FullScreenMapFragment.this.getActivity(), marker.getSnippet());
                 } else {
                     marker.showInfoWindow();
                 }
-                lastClicked = marker;
+                lastClickedId = marker.getSnippet();
                 return true;
             }
         });
