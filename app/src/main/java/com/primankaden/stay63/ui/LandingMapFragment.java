@@ -6,6 +6,8 @@ import android.content.Loader;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -93,6 +95,23 @@ public class LandingMapFragment extends MapFragment implements OnMapReadyCallbac
             @Override
             public void onMapClick(LatLng latLng) {
                 FullScreenMapActivity.startMe(getActivity());
+            }
+        });
+        setInfoWindowAdapter(map);
+    }
+
+    protected void setInfoWindowAdapter(GoogleMap map){
+        map.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+            @Override
+            public View getInfoWindow(Marker marker) {
+                return null;
+            }
+
+            @Override
+            public View getInfoContents(Marker marker) {
+                View v = getActivity().getLayoutInflater().inflate(R.layout.v_map_info_window, null);
+                ((TextView) v.findViewById(R.id.info_text_view)).setText(marker.getTitle());
+                return v;
             }
         });
     }

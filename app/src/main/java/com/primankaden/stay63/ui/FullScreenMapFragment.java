@@ -32,6 +32,7 @@ public class FullScreenMapFragment extends LandingMapFragment {
                 return true;
             }
         });
+        setInfoWindowAdapter(map);
     }
 
     @Override
