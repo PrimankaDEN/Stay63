@@ -1,8 +1,8 @@
 package com.primankaden.stay63.ui;
 
-import android.content.AsyncTaskLoader;
-import android.content.Loader;
 import android.os.Bundle;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;

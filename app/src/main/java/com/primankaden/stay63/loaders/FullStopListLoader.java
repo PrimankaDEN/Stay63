@@ -1,7 +1,7 @@
 package com.primankaden.stay63.loaders;
 
-import android.content.AsyncTaskLoader;
 import android.content.Context;
+import android.support.v4.content.AsyncTaskLoader;
 
 import com.primankaden.stay63.bl.StopBusinessLogic;
 import com.primankaden.stay63.entities.FullStop;

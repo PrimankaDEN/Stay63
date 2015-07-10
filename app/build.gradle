@@ -12,9 +12,9 @@ android {
     }
     defaultConfig {
         applicationId "com.primankaden.stay63"
-        minSdkVersion 21
+        minSdkVersion 9
         targetSdkVersion 22
-        versionCode 1
+        versionCode 2
         versionName "1.0"
     }
     buildTypes {
@@ -27,6 +27,8 @@ android {
         arguments {
             androidManifestFile variant.outputs[0].processResources.manifestFile
         }
+    }
+    productFlavors {
     }
 }
 

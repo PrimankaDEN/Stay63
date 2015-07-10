@@ -1,6 +1,7 @@
 package com.primankaden.stay63.bl;
 
 import android.content.Context;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -73,7 +74,7 @@ public class GeoBusinessLogic {
 
     public void registerListener(LocationListener listener) {
         if (listeners.isEmpty()) {
-            manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+            manager.requestLocationUpdates(getSafeProvider(), 0, 0, locationListener);
         }
         listeners.add(listener);
     }
@@ -85,5 +86,13 @@ public class GeoBusinessLogic {
         if (listeners.isEmpty()) {
             manager.removeUpdates(locationListener);
         }
+    }
+
+    public String getSafeProvider() {
+        String provider = manager.getBestProvider(new Criteria(), true);
+        if (provider == null || provider.isEmpty()) {
+            provider = LocationManager.GPS_PROVIDER;
+        }
+        return provider;
     }
 }

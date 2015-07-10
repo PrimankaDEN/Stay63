@@ -1,10 +1,10 @@
 package com.primankaden.stay63.ui;
 
 import android.app.Activity;
-import android.app.LoaderManager;
-import android.content.AsyncTaskLoader;
-import android.content.Loader;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -27,7 +27,7 @@ import org.androidannotations.annotations.ViewById;
 import java.util.List;
 
 @EActivity(R.layout.a_stop_info)
-public class StopInfoActivity extends Activity implements LoaderManager.LoaderCallbacks<StopInfoActivity.LoadData> {
+public class StopInfoActivity extends FragmentActivity implements android.support.v4.app.LoaderManager.LoaderCallbacks<StopInfoActivity.LoadData> {
     private static final String TAG = "StopInfoActivity";
     @Extra
     protected String stopId;
@@ -52,7 +52,7 @@ public class StopInfoActivity extends Activity implements LoaderManager.LoaderCa
 
     @AfterViews
     protected void init() {
-        getLoaderManager().initLoader(Loaders.TRANSPORT_LIST_LOADER, null, this).forceLoad();
+        getSupportLoaderManager().initLoader(Loaders.TRANSPORT_LIST_LOADER, null, this).forceLoad();
         adapter = new ArrivedBusAdapter(this);
         list.setAdapter(adapter);
         bar.setVisibility(View.VISIBLE);

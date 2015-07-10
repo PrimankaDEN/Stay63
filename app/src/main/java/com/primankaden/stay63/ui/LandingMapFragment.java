@@ -1,18 +1,18 @@
 package com.primankaden.stay63.ui;
 
-import android.app.LoaderManager;
-import android.content.AsyncTaskLoader;
-import android.content.Loader;
+
 import android.location.Location;
 import android.os.Bundle;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @EFragment
-public class LandingMapFragment extends MapFragment implements OnMapReadyCallback, LoaderManager.LoaderCallbacks<List<FullStop>> {
+public class LandingMapFragment extends SupportMapFragment implements OnMapReadyCallback, android.support.v4.app.LoaderManager.LoaderCallbacks<List<FullStop>> {
     private static final String TAG = "LandingMapFragment";
     private GeoBusinessLogic.LocationListener listener;
     private static final float MAP_SCALE = 14;
@@ -41,11 +41,11 @@ public class LandingMapFragment extends MapFragment implements OnMapReadyCallbac
 
     @AfterViews
     protected void init() {
-        getActivity().getLoaderManager().initLoader(Loaders.NEAREST_STOP_LIST_LOADER, new Bundle(), LandingMapFragment.this).forceLoad();
+        getActivity().getSupportLoaderManager().initLoader(Loaders.NEAREST_STOP_LIST_LOADER, new Bundle(), LandingMapFragment.this).forceLoad();
         listener = new GeoBusinessLogic.LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                getActivity().getLoaderManager().restartLoader(Loaders.NEAREST_STOP_LIST_LOADER, new Bundle(), LandingMapFragment.this).forceLoad();
+                getActivity().getSupportLoaderManager().restartLoader(Loaders.NEAREST_STOP_LIST_LOADER, new Bundle(), LandingMapFragment.this).forceLoad();
             }
         };
         changeMapSettings(getMap());
@@ -66,6 +66,9 @@ public class LandingMapFragment extends MapFragment implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        if (googleMap==null){
+            return;
+        }
         LatLng currentCoords = GeoBusinessLogic.getInstance().getCurrentLatLng();
         googleMap.clear();
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentCoords, MAP_SCALE));
@@ -78,6 +81,9 @@ public class LandingMapFragment extends MapFragment implements OnMapReadyCallbac
     }
 
     protected void changeMapSettings(GoogleMap map) {
+        if (map==null){
+            return;
+        }
         UiSettings sets = map.getUiSettings();
         sets.setScrollGesturesEnabled(false);
         sets.setRotateGesturesEnabled(false);

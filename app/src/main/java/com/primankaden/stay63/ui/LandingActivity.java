@@ -1,13 +1,12 @@
 package com.primankaden.stay63.ui;
 
-import android.app.Activity;
-import android.app.LoaderManager;
-import android.content.Loader;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
@@ -25,7 +24,7 @@ import org.androidannotations.annotations.ViewById;
 import java.util.List;
 
 @EActivity(R.layout.a_landing)
-public class LandingActivity extends Activity implements LoaderManager.LoaderCallbacks<List<FullStop>> {
+public class LandingActivity extends FragmentActivity implements LoaderManager.LoaderCallbacks<List<FullStop>> {
     private final static String TAG = "LandingActivity";
     @ViewById(R.id.progress_bar)
     protected ProgressBar bar;
@@ -37,9 +36,9 @@ public class LandingActivity extends Activity implements LoaderManager.LoaderCal
     @AfterViews
     protected void init() {
         adapter = new LandingAdapter(this);
-        listView.setAdapter(adapter);
         View headerView = getLayoutInflater().inflate(R.layout.v_map_header, null);
         listView.addHeaderView(headerView);
+        listView.setAdapter(adapter);
         listener = new GeoBusinessLogic.LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
@@ -49,7 +48,7 @@ public class LandingActivity extends Activity implements LoaderManager.LoaderCal
         };
         bar.setVisibility(View.VISIBLE);
         listView.setVisibility(View.INVISIBLE);
-        LoaderManager manager = this.getLoaderManager();
+        LoaderManager manager = this.getSupportLoaderManager();
         manager.initLoader(Loaders.FULL_STOP_LIST_LOADER, null, LandingActivity.this).forceLoad();
     }
 

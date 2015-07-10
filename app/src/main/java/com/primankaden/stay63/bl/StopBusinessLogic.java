@@ -57,6 +57,7 @@ public class StopBusinessLogic {
     }
 
     public synchronized void syncFullStopList() {
+        Log.d(TAG, "Sync started");
         if (isFullStopSynced()) {
             Log.d(TAG, "sync canceled");
             return;
