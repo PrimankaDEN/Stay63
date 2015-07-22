@@ -4,7 +4,8 @@ import com.primankaden.stay63.XmlUtils;
 
 import org.w3c.dom.Element;
 
-public class Stop {
+public class Stop extends AbsPoint {
+    @Override
     public String getId() {
         return id;
     }
@@ -13,6 +14,7 @@ public class Stop {
         this.id = id;
     }
 
+    @Override
     public String getTitle() {
         return title;
     }

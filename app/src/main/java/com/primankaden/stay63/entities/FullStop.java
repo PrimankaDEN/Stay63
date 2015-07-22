@@ -1,6 +1,5 @@
 package com.primankaden.stay63.entities;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.primankaden.stay63.XmlUtils;
 
 import org.w3c.dom.Element;
@@ -8,6 +7,7 @@ import org.w3c.dom.Element;
 import java.util.List;
 
 public class FullStop extends Stop {
+
     public List<String> getBusesMunicipal() {
         return busesMunicipal;
     }
@@ -72,22 +72,6 @@ public class FullStop extends Stop {
         this.infotabloExists = infotabloExists;
     }
 
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
-
     private List<String> busesMunicipal;
     private List<String> busesCommercial;
     private List<String> busesPrigorod;
@@ -96,17 +80,11 @@ public class FullStop extends Stop {
     private List<String> trams;
     private List<String> metros;
     private List<String> infotabloExists;
-    private double latitude;
-    private double longitude;
 
     @Override
     public void init(Element e) {
         super.init(e);
         setLatitude(XmlUtils.getDoubleValue(e, "latitude"));
         setLongitude(XmlUtils.getDoubleValue(e, "longitude"));
-    }
-
-    public LatLng getLatLng(){
-        return new LatLng(getLatitude(), getLongitude());
     }
 }
