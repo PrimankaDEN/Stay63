@@ -5,4 +5,5 @@
     <string name="title_activity_stop_info">Nearest stops</string>
     <string name="bus_number_title">Автобус %s</string>
     <string name="time_arrived_pattern">Через %s минут</string>
+    <string name="cluster_title_pattern" formatted="false">%s\nи еще %s</string>
 </resources>

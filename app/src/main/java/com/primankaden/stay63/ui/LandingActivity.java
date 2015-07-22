@@ -48,12 +48,12 @@ public class LandingActivity extends FragmentActivity implements LoaderManager.L
         };
         bar.setVisibility(View.VISIBLE);
         listView.setVisibility(View.INVISIBLE);
-        LoaderManager manager = this.getSupportLoaderManager();
-        manager.initLoader(Loaders.FULL_STOP_LIST_LOADER, null, LandingActivity.this).forceLoad();
     }
 
     @Override
     protected void onResume() {
+        LoaderManager manager = this.getSupportLoaderManager();
+        manager.initLoader(Loaders.FULL_STOP_LIST_LOADER, null, LandingActivity.this).forceLoad();
         super.onResume();
         GeoBusinessLogic.getInstance().registerListener(listener);
     }

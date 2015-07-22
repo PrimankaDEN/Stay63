@@ -24,7 +24,7 @@ public class LandingAdapter extends BaseAdapter {
     }
 
     public void updateLocation() {
-        StopBusinessLogic.getInstance().sortByLocation(list, GeoBusinessLogic.getInstance().getLastKnownLocation());
+        StopBusinessLogic.getInstance().sortByLocation(list, GeoBusinessLogic.getInstance().getCurrentLocation());
     }
 
     private List<FullStop> list = new ArrayList<>();

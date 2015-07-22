@@ -3,7 +3,6 @@ package com.primankaden.stay63.ui;
 
 import android.location.Location;
 import android.os.Bundle;
-import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.View;
@@ -14,15 +13,13 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.primankaden.stay63.R;
 import com.primankaden.stay63.bl.GeoBusinessLogic;
-import com.primankaden.stay63.bl.StopBusinessLogic;
-import com.primankaden.stay63.entities.FullStop;
+import com.primankaden.stay63.entities.marker.AbsMarker;
 import com.primankaden.stay63.loaders.Loaders;
+import com.primankaden.stay63.loaders.MarkerListLoader;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
@@ -31,29 +28,50 @@ import java.util.ArrayList;
 import java.util.List;
 
 @EFragment
-public class LandingMapFragment extends SupportMapFragment implements OnMapReadyCallback, android.support.v4.app.LoaderManager.LoaderCallbacks<List<FullStop>> {
+public class LandingMapFragment extends SupportMapFragment implements OnMapReadyCallback, android.support.v4.app.LoaderManager.LoaderCallbacks<List<AbsMarker>> {
     private static final String TAG = "LandingMapFragment";
     private GeoBusinessLogic.LocationListener listener;
     private static final float MAP_SCALE = 14;
-    private static final int STOPS_COUNT = 10;
-    private List<FullStop> list = new ArrayList<>();
-    protected static final String YOU_MARKER_ID = "You position";
+    private List<AbsMarker> list = new ArrayList<>();
 
     @AfterViews
     protected void init() {
-        getActivity().getSupportLoaderManager().initLoader(Loaders.NEAREST_STOP_LIST_LOADER, new Bundle(), LandingMapFragment.this).forceLoad();
-        listener = new GeoBusinessLogic.LocationListener() {
+        listener = getLocationListener();
+        changeMapSettings(getMap());
+        getMap().setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                return LandingMapFragment.this.onMarkerClick(marker);
+            }
+        });
+        getMapAsync(this);
+    }
+
+    protected GeoBusinessLogic.LocationListener getLocationListener() {
+        return new GeoBusinessLogic.LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                getActivity().getSupportLoaderManager().restartLoader(Loaders.NEAREST_STOP_LIST_LOADER, new Bundle(), LandingMapFragment.this).forceLoad();
+                initLoader();
             }
         };
-        changeMapSettings(getMap());
-        getMapAsync(this);
+    }
+
+    protected void initLoader() {
+        if (getMap() != null && getMap().getProjection().getVisibleRegion().latLngBounds != null) {
+            Bundle b = MarkerListLoader.prepareArgs(getMap().getProjection().getVisibleRegion().latLngBounds, new Bundle());
+            Loader loader = getActivity().getSupportLoaderManager().getLoader(Loaders.MARKER_LIST_LOADER);
+            if (loader == null) {
+                getActivity().getSupportLoaderManager().restartLoader(Loaders.MARKER_LIST_LOADER, b, LandingMapFragment.this).forceLoad();
+            } else {
+                ((MarkerListLoader) loader).setArgs(b);
+                getActivity().getSupportLoaderManager().initLoader(Loaders.MARKER_LIST_LOADER, b, LandingMapFragment.this).forceLoad();
+            }
+        }
     }
 
     @Override
     public void onResume() {
+        initLoader();
         super.onResume();
         GeoBusinessLogic.getInstance().registerListener(listener);
     }
@@ -66,22 +84,26 @@ public class LandingMapFragment extends SupportMapFragment implements OnMapReady
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        if (googleMap==null){
+        if (googleMap == null) {
             return;
         }
-        LatLng currentCoords = GeoBusinessLogic.getInstance().getCurrentLatLng();
         googleMap.clear();
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentCoords, MAP_SCALE));
-        googleMap.addMarker(new MarkerOptions().title(getActivity().getString(R.string.current_postition)).position(currentCoords).icon(BitmapDescriptorFactory
-                .defaultMarker(BitmapDescriptorFactory.HUE_BLUE)).snippet(YOU_MARKER_ID));
-        for (FullStop stop : list) {
-            googleMap.addMarker(new MarkerOptions().title(stop.getTitle()).position(stop.getLatLng()).icon(BitmapDescriptorFactory
-                    .defaultMarker(BitmapDescriptorFactory.HUE_RED)).snippet(stop.getId()));
+        moveCameraToIfNeeded(googleMap, GeoBusinessLogic.getInstance().getCurrentLatLng());
+        drawMarkers(googleMap, list);
+    }
+
+    protected void drawMarkers(GoogleMap map, List<AbsMarker> markerList) {
+        for (AbsMarker m : markerList) {
+            map.addMarker(m.getMarker());
         }
     }
 
+    protected void moveCameraToIfNeeded(GoogleMap map, LatLng to) {
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(to, MAP_SCALE));
+    }
+
     protected void changeMapSettings(GoogleMap map) {
-        if (map==null){
+        if (map == null) {
             return;
         }
         UiSettings sets = map.getUiSettings();
@@ -106,7 +128,12 @@ public class LandingMapFragment extends SupportMapFragment implements OnMapReady
         setInfoWindowAdapter(map);
     }
 
-    protected void setInfoWindowAdapter(GoogleMap map){
+    protected boolean onMarkerClick(Marker marker) {
+        marker.showInfoWindow();
+        return true;
+    }
+
+    protected void setInfoWindowAdapter(GoogleMap map) {
         map.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
             @Override
             public View getInfoWindow(Marker marker) {
@@ -123,24 +150,19 @@ public class LandingMapFragment extends SupportMapFragment implements OnMapReady
     }
 
     @Override
-    public Loader<List<FullStop>> onCreateLoader(int id, Bundle args) {
-        return new AsyncTaskLoader<List<FullStop>>(this.getActivity()) {
-            @Override
-            public List<FullStop> loadInBackground() {
-                return StopBusinessLogic.getInstance().getNearestStops(STOPS_COUNT);
-            }
-        };
+    public Loader<List<AbsMarker>> onCreateLoader(int id, Bundle args) {
+        return new MarkerListLoader(this.getActivity(), args);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<FullStop>> loader, List<FullStop> data) {
+    public void onLoadFinished(Loader<List<AbsMarker>> loader, List<AbsMarker> data) {
         Log.d(TAG, "loaded " + data.size() + " stops");
         list = data;
         onMapReady(this.getMap());
     }
 
     @Override
-    public void onLoaderReset(Loader<List<FullStop>> loader) {
+    public void onLoaderReset(Loader<List<AbsMarker>> loader) {
         Log.d(TAG, "loader was reset");
     }
 }

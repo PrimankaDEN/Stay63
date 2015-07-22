@@ -1,26 +1,41 @@
 package com.primankaden.stay63.ui;
 
-import android.os.Bundle;
-import android.support.v4.content.AsyncTaskLoader;
-import android.support.v4.content.Loader;
+import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.Marker;
-import com.primankaden.stay63.bl.StopBusinessLogic;
-import com.primankaden.stay63.entities.FullStop;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.androidannotations.annotations.EFragment;
 
-import java.util.List;
-
 @EFragment
 public class FullScreenMapFragment extends LandingMapFragment {
-    private static final int STOPS_COUNT = 25;
+    private static final String TAG = "FullScreenMapFragment";
     private String lastClickedId = "";
+    private boolean isFirstTimeFinished = false;
+    private final static int MAX_ZOOM = 19;
+
+    @Override
+    protected void moveCameraToIfNeeded(GoogleMap map, LatLng to) {
+        if (!isFirstTimeFinished) {
+            super.moveCameraToIfNeeded(map, to);
+            isFirstTimeFinished = true;
+        }
+    }
+
+    /*@Override
+    protected boolean onMarkerClick(Marker marker) {
+        if ("cluster".equals(marker.getSnippet())) {
+            float zoom = (getMap().getCameraPosition().zoom + 0.5f);
+            getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), zoom > MAX_ZOOM ? MAX_ZOOM : zoom));
+            initLoader();
+        }
+        return super.onMarkerClick(marker);
+    }*/
 
     @Override
     protected void changeMapSettings(GoogleMap map) {
-        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+        /*map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
                 if (lastClickedId.equals(marker.getSnippet()) && !YOU_MARKER_ID.equals(marker.getSnippet())) {
@@ -32,16 +47,14 @@ public class FullScreenMapFragment extends LandingMapFragment {
                 return true;
             }
         });
-        setInfoWindowAdapter(map);
-    }
-
-    @Override
-    public Loader<List<FullStop>> onCreateLoader(int id, Bundle args) {
-        return new AsyncTaskLoader<List<FullStop>>(this.getActivity()) {
+        */
+        map.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
-            public List<FullStop> loadInBackground() {
-                return StopBusinessLogic.getInstance().getNearestStops(STOPS_COUNT);
+            public void onCameraChange(CameraPosition cameraPosition) {
+                initLoader();
+                Log.d(TAG, "camera changed");
             }
-        };
+        });
+        setInfoWindowAdapter(map);
     }
 }

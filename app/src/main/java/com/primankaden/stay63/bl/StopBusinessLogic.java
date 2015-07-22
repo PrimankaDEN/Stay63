@@ -39,7 +39,7 @@ public class StopBusinessLogic {
     public List<FullStop> getNearestStops(int count) {
         List<FullStop> result = new ArrayList<>();
         List<FullStop> list = getAllFullStops();
-        sortByLocation(list, GeoBusinessLogic.getInstance().getLastKnownLocation());
+        sortByLocation(list, GeoBusinessLogic.getInstance().getCurrentLocation());
         for (int i = 0; i < count && i < list.size(); i++) {
             result.add(list.get(i));
         }
@@ -119,5 +119,19 @@ public class StopBusinessLogic {
             }
         }
         return null;
+    }
+
+    public List<FullStop> getBetweenCoords(double minLatitude, double maxLatitude, double minLongitude, double maxLongitude) {
+        List<FullStop> result = new ArrayList<>();
+        List<FullStop> list = getAllFullStops();
+        for (FullStop stop : list) {
+            if (stop.getLatitude() > minLatitude
+                    && stop.getLatitude() < maxLatitude
+                    && stop.getLongitude() > minLongitude
+                    && stop.getLongitude() < maxLongitude) {
+                result.add(stop);
+            }
+        }
+        return result;
     }
 }

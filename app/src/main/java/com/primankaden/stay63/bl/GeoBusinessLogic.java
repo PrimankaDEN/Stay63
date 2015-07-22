@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.primankaden.stay63.Stay63Application;
+import com.primankaden.stay63.entities.AbsPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +54,7 @@ public class GeoBusinessLogic {
         listeners = new ArrayList<>();
     }
 
-    public Location getLastKnownLocation() {
+    public Location getCurrentLocation() {
         return lastKnownLocation;
     }
 
@@ -94,5 +95,22 @@ public class GeoBusinessLogic {
             provider = LocationManager.GPS_PROVIDER;
         }
         return provider;
+    }
+
+    public AbsPoint getCurrentPoint() {
+        AbsPoint p = new AbsPoint() {
+            @Override
+            public String getTitle() {
+                return "You";
+            }
+
+            @Override
+            public String getId() {
+                return "You";
+            }
+        };
+        p.setLatitude(getCurrentLatLng().latitude);
+        p.setLongitude(getCurrentLatLng().longitude);
+        return p;
     }
 }
