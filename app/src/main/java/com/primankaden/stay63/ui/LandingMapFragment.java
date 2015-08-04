@@ -19,7 +19,7 @@ import com.primankaden.stay63.R;
 import com.primankaden.stay63.bl.GeoBusinessLogic;
 import com.primankaden.stay63.entities.marker.AbsMarker;
 import com.primankaden.stay63.loaders.Loaders;
-import com.primankaden.stay63.loaders.MarkerListLoader;
+import com.primankaden.stay63.loaders.LocalMarkerListLoader;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
@@ -58,15 +58,23 @@ public class LandingMapFragment extends SupportMapFragment implements OnMapReady
 
     protected void initLoader() {
         if (getMap() != null && getMap().getProjection().getVisibleRegion().latLngBounds != null) {
-            Bundle b = MarkerListLoader.prepareArgs(getMap().getProjection().getVisibleRegion().latLngBounds, new Bundle());
-            Loader loader = getActivity().getSupportLoaderManager().getLoader(Loaders.MARKER_LIST_LOADER);
+            Bundle b = prepareArgs();
+            Loader loader = getActivity().getSupportLoaderManager().getLoader(getLoaderId());
             if (loader == null) {
-                getActivity().getSupportLoaderManager().restartLoader(Loaders.MARKER_LIST_LOADER, b, LandingMapFragment.this).forceLoad();
+                getActivity().getSupportLoaderManager().restartLoader(getLoaderId(), b, LandingMapFragment.this).forceLoad();
             } else {
-                ((MarkerListLoader) loader).setArgs(b);
-                getActivity().getSupportLoaderManager().initLoader(Loaders.MARKER_LIST_LOADER, b, LandingMapFragment.this).forceLoad();
+                ((LocalMarkerListLoader) loader).setArgs(b);
+                getActivity().getSupportLoaderManager().initLoader(getLoaderId(), b, LandingMapFragment.this).forceLoad();
             }
         }
+    }
+
+    protected Bundle prepareArgs(){
+        return  LocalMarkerListLoader.prepareArgs(getMap().getProjection().getVisibleRegion().latLngBounds, new Bundle());
+    }
+
+    protected int getLoaderId(){
+        return Loaders.MARKER_LIST_LOADER;
     }
 
     @Override
@@ -151,7 +159,7 @@ public class LandingMapFragment extends SupportMapFragment implements OnMapReady
 
     @Override
     public Loader<List<AbsMarker>> onCreateLoader(int id, Bundle args) {
-        return new MarkerListLoader(this.getActivity(), args);
+        return new LocalMarkerListLoader(this.getActivity(), args);
     }
 
     @Override
