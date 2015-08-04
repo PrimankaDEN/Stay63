@@ -10,7 +10,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.primankaden.stay63.loaders.GlobalMarkerListLoader;
 import com.primankaden.stay63.loaders.Loaders;
-import com.primankaden.stay63.ui.controllers.AbsMapFragment;
 import com.primankaden.stay63.ui.controllers.DiscreteScaleController;
 
 import org.androidannotations.annotations.EFragment;
@@ -69,5 +68,6 @@ public class FullScreenMapFragment extends AbsMapFragment implements DiscreteSca
     @Override
     public void onScaleChanged(double discreteScale) {
         //TODO restart loader here
+        initLoader();
     }
 }

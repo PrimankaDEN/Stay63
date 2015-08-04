@@ -1,4 +1,4 @@
-package com.primankaden.stay63.ui.controllers;
+package com.primankaden.stay63.ui;
 
 import android.location.Location;
 import android.os.Bundle;
@@ -14,6 +14,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.primankaden.stay63.bl.GeoBusinessLogic;
 import com.primankaden.stay63.entities.marker.AbsMarker;
 import com.primankaden.stay63.loaders.ParametrizedLoader;
+import com.primankaden.stay63.ui.controllers.MapMarkerController;
 import com.primankaden.stay63.ui.controllers.MapMarkerController.MapMarkerControllerListener;
 
 import org.androidannotations.annotations.AfterViews;
@@ -26,7 +27,7 @@ public abstract class AbsMapFragment extends SupportMapFragment implements OnMap
         android.support.v4.app.LoaderManager.LoaderCallbacks<List<AbsMarker>>,
         MapMarkerControllerListener {
     private static final String TAG = "AbsMarkerController";
-    private static final float MAP_SCALE = 5;
+    private static final float MAP_SCALE = 10;
     private GeoBusinessLogic.LocationListener geoListener;
     private MapMarkerController markerController;
 
@@ -96,6 +97,7 @@ public abstract class AbsMapFragment extends SupportMapFragment implements OnMap
     }
 
     protected final void initLoader() {
+        Log.d(TAG, "Init loader");
         if (getMap() != null && getMap().getProjection().getVisibleRegion().latLngBounds != null) {
             Bundle b = prepareLoaderArgs();
             Loader loader = getActivity().getSupportLoaderManager().getLoader(getLoaderId());

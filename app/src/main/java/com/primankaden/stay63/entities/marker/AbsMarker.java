@@ -32,7 +32,7 @@ public abstract class AbsMarker {
         to.setVisible(true);
     }
 
-    protected LatLng getPosition() {
+    public LatLng getPosition() {
         return position;
     }
 

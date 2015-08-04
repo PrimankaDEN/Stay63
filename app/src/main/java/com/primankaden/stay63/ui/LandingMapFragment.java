@@ -14,7 +14,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.primankaden.stay63.R;
 import com.primankaden.stay63.loaders.Loaders;
 import com.primankaden.stay63.loaders.LocalMarkerListLoader;
-import com.primankaden.stay63.ui.controllers.AbsMapFragment;
 
 import org.androidannotations.annotations.EFragment;
 

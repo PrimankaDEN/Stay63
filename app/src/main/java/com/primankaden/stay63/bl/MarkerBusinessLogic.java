@@ -15,10 +15,10 @@ public class MarkerBusinessLogic {
     private static final int CLUSTER_WIDTH = 5;
     private static final int CLUSTER_HEIGHT = 6;
     //TODO process dynamically
-    private static final double MAX_LATITUDE = 50.5018;
-    private static final double MIN_LATITUDE = 49.7576;
-    private static final double MAX_LONGITUDE = 53.5715;
-    private static final double MIN_LONGITUDE = 52.9697;
+    private static final double MAX_LATITUDE = 53.5715;
+    private static final double MIN_LATITUDE = 52.9697;
+    private static final double MAX_LONGITUDE = 50.5018;
+    private static final double MIN_LONGITUDE = 49.7576;
     private static MarkerBusinessLogic instance;
 
     private MarkerBusinessLogic() {
@@ -54,7 +54,7 @@ public class MarkerBusinessLogic {
             this.pointsBefore = pointsBefore;
         }
 
-        private static final double STEP_IN_DP = 20;
+        private static final double STEP_IN_DP = 60;
 
         private double getStep(double scale) {
             double worldWideInDP = 256 * Math.pow(2, scale);
@@ -63,9 +63,9 @@ public class MarkerBusinessLogic {
 
         ClusterMatrix forScale(double scale) {
             double step = getStep(scale);
-            int horSize = (int) ((MAX_LONGITUDE - MIN_LONGITUDE) / step);
-            int verSize = (int) ((MAX_LATITUDE - MIN_LATITUDE) / step);
-            points = new ClusterPoint[verSize+1][horSize+1];
+            int latSize = (int) ((MAX_LATITUDE - MIN_LATITUDE) / step);
+            int longSize = (int) ((MAX_LONGITUDE - MIN_LONGITUDE) / step);
+            points = new ClusterPoint[latSize+1][longSize+1];
             for (AbsPoint p : pointsBefore) {
                 int column = (int) ((p.getLongitude() - MIN_LONGITUDE) / step);
                 int line = (int) ((p.getLatitude() - MIN_LATITUDE) / step);
