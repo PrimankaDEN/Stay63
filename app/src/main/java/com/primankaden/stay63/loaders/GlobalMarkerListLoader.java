@@ -13,7 +13,7 @@ import com.primankaden.stay63.entities.marker.AbsMarker;
 import java.util.Date;
 import java.util.List;
 
-public class GlobalMarkerListLoader extends AsyncTaskLoader<List<AbsMarker>> {
+public class GlobalMarkerListLoader extends AsyncTaskLoader<List<AbsMarker>> implements ParametrizedLoader{
     private final static String SCALE_TAG = "scale";
     private static final String TAG = "GlobalMarkerListLoader";
     private double scale;
@@ -22,7 +22,7 @@ public class GlobalMarkerListLoader extends AsyncTaskLoader<List<AbsMarker>> {
         super(context);
         unpackArgs(args);
     }
-
+    @Override
     public void setArgs(Bundle b) {
         unpackArgs(b);
     }

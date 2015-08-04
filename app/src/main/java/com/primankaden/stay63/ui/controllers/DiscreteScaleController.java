@@ -1,4 +1,4 @@
-package com.primankaden.stay63.ui;
+package com.primankaden.stay63.ui.controllers;
 
 public class DiscreteScaleController {
     public interface OnScaleChangedListener{

@@ -13,7 +13,7 @@ import com.primankaden.stay63.entities.marker.AbsMarker;
 import java.util.Date;
 import java.util.List;
 
-public class LocalMarkerListLoader extends AsyncTaskLoader<List<AbsMarker>> {
+public class LocalMarkerListLoader extends AsyncTaskLoader<List<AbsMarker>> implements ParametrizedLoader {
     public static final String SOUTH_TAG = "south";
     public static final String NORTH_TAG = "north";
     public static final String WEST_TAG = "west";
@@ -29,6 +29,7 @@ public class LocalMarkerListLoader extends AsyncTaskLoader<List<AbsMarker>> {
         unpackArgs(args);
     }
 
+    @Override
     public void setArgs(Bundle b) {
         unpackArgs(b);
     }
