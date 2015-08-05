@@ -1,19 +1,24 @@
 package com.primankaden.stay63.ui.controllers;
 
+import android.util.Log;
+
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.primankaden.stay63.entities.marker.AbsMarker;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 public class MapMarkerController {
+    private static final String TAG = "MapMarkerController";
     private List<Marker> mapMarkers = new LinkedList<>();
     private List<AbsMarker> markers;
     private MapMarkerControllerListener listener;
+    private static final int MAX_CASHED_MARKER_COUNT = 50;
 
     public MapMarkerController(MapMarkerControllerListener listener) {
         this.listener = listener;
@@ -28,6 +33,8 @@ public class MapMarkerController {
     }
 
     public void drawMarkers() {
+        Log.d(TAG, "refreshing markers on map");
+        Date starDate = new Date();
         if (listener == null) {
             return;
         }
@@ -35,6 +42,8 @@ public class MapMarkerController {
         if (map == null) {
             return;
         }
+        int markerCounter = 0;
+        int visibleMarkerCounter = 0;
         LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
         Iterator<Marker> mapMarkerIterator = mapMarkers.iterator();
         Iterator<AbsMarker> markerIterator = markers.iterator();
@@ -48,12 +57,23 @@ public class MapMarkerController {
                 } else {
                     addedMarkers.add(map.addMarker(marker.getMarker()));
                 }
+                markerCounter++;
+                visibleMarkerCounter++;
             }
         }
         while (mapMarkerIterator.hasNext()) {
-            mapMarkerIterator.next().setVisible(false);
+            if (markerCounter > MAX_CASHED_MARKER_COUNT) {
+                mapMarkerIterator.next().remove();
+                mapMarkerIterator.remove();
+            } else {
+                mapMarkerIterator.next().setVisible(false);
+            }
+            markerCounter++;
         }
         mapMarkers.addAll(addedMarkers);
+        Log.d(TAG, "Complete for " + (new Date().getTime() - starDate.getTime()) + " milliseconds, "
+                + visibleMarkerCounter + " markers are visible"
+                + mapMarkers.size() + " markers are cashed and ");
     }
 
     private boolean isMarkerVisible(LatLngBounds bounds, AbsMarker marker) {
@@ -62,6 +82,4 @@ public class MapMarkerController {
                 && marker.getPosition().longitude > bounds.southwest.longitude
                 && marker.getPosition().longitude < bounds.northeast.longitude;
     }
-
-
 }
