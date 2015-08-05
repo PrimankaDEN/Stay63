@@ -1,5 +1,7 @@
 package com.primankaden.stay63.bl;
 
+import android.util.SparseArray;
+
 import com.primankaden.stay63.entities.AbsPoint;
 import com.primankaden.stay63.entities.ClusterPoint;
 import com.primankaden.stay63.entities.FullStop;
@@ -14,10 +16,10 @@ import java.util.List;
 public class MarkerBusinessLogic {
     private static final int CLUSTER_WIDTH = 5;
     private static final int CLUSTER_HEIGHT = 6;
-    //TODO process dynamically
-    private static final double MAX_LATITUDE = 53.5715;
+    //TODO process dynamically?
+//    private static final double MAX_LATITUDE = 53.5715;
     private static final double MIN_LATITUDE = 52.9697;
-    private static final double MAX_LONGITUDE = 50.5018;
+    //    private static final double MAX_LONGITUDE = 50.5018;
     private static final double MIN_LONGITUDE = 49.7576;
     private static MarkerBusinessLogic instance;
 
@@ -46,12 +48,15 @@ public class MarkerBusinessLogic {
     }
 
     private class ClusterMatrix {
-        private List<? extends AbsPoint> pointsBefore;
-        private ClusterPoint points[][];
-        private double lastProcessedScale;
+        private final List<? extends AbsPoint> pointsBefore;
+        private SparseArray<SparseArray<ClusterPoint>> matrix;
 
         ClusterMatrix(List<? extends AbsPoint> pointsBefore) {
             this.pointsBefore = pointsBefore;
+        }
+
+        private void initMatrix() {
+            matrix = new SparseArray<>();
         }
 
         private static final double STEP_IN_DP = 60;
@@ -63,39 +68,52 @@ public class MarkerBusinessLogic {
 
         ClusterMatrix forScale(double scale) {
             double step = getStep(scale);
-            int latSize = (int) ((MAX_LATITUDE - MIN_LATITUDE) / step);
-            int longSize = (int) ((MAX_LONGITUDE - MIN_LONGITUDE) / step);
-            points = new ClusterPoint[latSize+1][longSize+1];
+            initMatrix();
             for (AbsPoint p : pointsBefore) {
                 int column = (int) ((p.getLongitude() - MIN_LONGITUDE) / step);
                 int line = (int) ((p.getLatitude() - MIN_LATITUDE) / step);
-                if (points[line][column] == null) {
-                    points[line][column] = new ClusterPoint();
-                }
-                points[line][column].add(p);
+                addTo(p, line, column);
             }
             return this;
         }
 
         ClusterMatrix betweenCoords(double minLatitude, double maxLatitude, double minLongitude, double maxLongitude) {
-            points = new ClusterPoint[CLUSTER_HEIGHT][CLUSTER_WIDTH];
-            double latRange = maxLatitude - minLatitude;
-            double longRange = maxLongitude - minLongitude;
+            double latStep = (maxLatitude - minLatitude) / CLUSTER_WIDTH;
+            double longStep = (maxLongitude - minLongitude) / CLUSTER_HEIGHT;
+            initMatrix();
             for (AbsPoint p : pointsBefore) {
-                int column = (int) ((p.getLongitude() - minLongitude) / (longRange / CLUSTER_WIDTH));
-                int line = (int) ((p.getLatitude() - minLatitude) / (latRange / CLUSTER_HEIGHT));
-                if (points[line][column] == null) {
-                    points[line][column] = new ClusterPoint();
-                }
-                points[line][column].add(p);
+                int column = (int) ((p.getLongitude() - minLongitude) / longStep);
+                int line = (int) ((p.getLatitude() - minLatitude) / latStep);
+                addTo(p, line, column);
             }
             return this;
         }
 
+        private void addTo(AbsPoint p, int lineTo, int columnTo) {
+            SparseArray<ClusterPoint> lineMap;
+            if (matrix.get(lineTo) == null) {
+                lineMap = new SparseArray<>();
+                matrix.put(lineTo, lineMap);
+            } else {
+                lineMap = matrix.get(lineTo);
+            }
+            ClusterPoint cPoint;
+            if (lineMap.get(columnTo) == null) {
+                cPoint = new ClusterPoint();
+                lineMap.put(columnTo, cPoint);
+            } else {
+                cPoint = lineMap.get(columnTo);
+            }
+            cPoint.add(p);
+        }
+
         public List<AbsMarker> asMarkerList() {
             List<AbsMarker> result = new ArrayList<>();
-            for (ClusterPoint[] ps : points) {
-                for (ClusterPoint p : ps) {
+            SparseArray<ClusterPoint> line;
+            for (int l = 0; l < matrix.size(); l++) {
+                line = matrix.get(matrix.keyAt(l));
+                for (int c = 0; c < line.size(); c++) {
+                    ClusterPoint p = line.get(line.keyAt(c));
                     if (p == null || p.isEmpty()) {
                         continue;
                     }
