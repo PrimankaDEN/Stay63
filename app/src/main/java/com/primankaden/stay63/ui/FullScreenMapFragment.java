@@ -19,28 +19,11 @@ public class FullScreenMapFragment extends LandingMapFragment {
     private String lastClickedId = "";
 
     @Override
-    protected void changeMapSettings(GoogleMap map) {
-        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                if (lastClickedId.equals(marker.getSnippet()) && !YOU_MARKER_ID.equals(marker.getSnippet())) {
-                    StopInfoActivity.startMe(FullScreenMapFragment.this.getActivity(), marker.getSnippet());
-                } else {
-                    marker.showInfoWindow();
-                }
-                lastClickedId = marker.getSnippet();
-                return true;
-            }
-        });
-        setInfoWindowAdapter(map);
-    }
-
-    @Override
     public Loader<List<FullStop>> onCreateLoader(int id, Bundle args) {
         return new AsyncTaskLoader<List<FullStop>>(this.getActivity()) {
             @Override
             public List<FullStop> loadInBackground() {
-                return StopBusinessLogic.getInstance().getNearestStops(STOPS_COUNT);
+                return StopBusinessLogic.getInstance().getAllFullStops();
             }
         };
     }

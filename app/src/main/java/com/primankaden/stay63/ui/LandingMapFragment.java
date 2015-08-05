@@ -18,6 +18,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.ClusterManager;
 import com.primankaden.stay63.R;
 import com.primankaden.stay63.bl.GeoBusinessLogic;
 import com.primankaden.stay63.bl.StopBusinessLogic;
@@ -38,6 +39,7 @@ public class LandingMapFragment extends SupportMapFragment implements OnMapReady
     private static final int STOPS_COUNT = 10;
     private List<FullStop> list = new ArrayList<>();
     protected static final String YOU_MARKER_ID = "You position";
+    private ClusterManager<MarkerItem> clusterManager;
 
     @AfterViews
     protected void init() {
@@ -48,6 +50,7 @@ public class LandingMapFragment extends SupportMapFragment implements OnMapReady
                 getActivity().getSupportLoaderManager().restartLoader(Loaders.NEAREST_STOP_LIST_LOADER, new Bundle(), LandingMapFragment.this).forceLoad();
             }
         };
+        clusterManager = new ClusterManager<>(this.getActivity(), getMap());
         changeMapSettings(getMap());
         getMapAsync(this);
     }
@@ -75,8 +78,10 @@ public class LandingMapFragment extends SupportMapFragment implements OnMapReady
         googleMap.addMarker(new MarkerOptions().title(getActivity().getString(R.string.current_postition)).position(currentCoords).icon(BitmapDescriptorFactory
                 .defaultMarker(BitmapDescriptorFactory.HUE_BLUE)).snippet(YOU_MARKER_ID));
         for (FullStop stop : list) {
-            googleMap.addMarker(new MarkerOptions().title(stop.getTitle()).position(stop.getLatLng()).icon(BitmapDescriptorFactory
-                    .defaultMarker(BitmapDescriptorFactory.HUE_RED)).snippet(stop.getId()));
+//            googleMap.addMarker(new MarkerOptions().title(stop.getTitle()).position(stop.getLatLng()).icon(BitmapDescriptorFactory
+//                    .defaultMarker(BitmapDescriptorFactory.HUE_RED)).snippet(stop.getId()));
+            clusterManager.addItem(new MarkerItem(stop.getLatLng()));
+
         }
     }
 
@@ -84,19 +89,6 @@ public class LandingMapFragment extends SupportMapFragment implements OnMapReady
         if (map==null){
             return;
         }
-        UiSettings sets = map.getUiSettings();
-        sets.setScrollGesturesEnabled(false);
-        sets.setRotateGesturesEnabled(false);
-        sets.setZoomGesturesEnabled(false);
-        sets.setZoomControlsEnabled(false);
-        sets.setTiltGesturesEnabled(false);
-        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                marker.showInfoWindow();
-                return true;
-            }
-        });
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
@@ -104,6 +96,8 @@ public class LandingMapFragment extends SupportMapFragment implements OnMapReady
             }
         });
         setInfoWindowAdapter(map);
+        map.setOnCameraChangeListener(clusterManager);
+        map.setOnMarkerClickListener(clusterManager);
     }
 
     protected void setInfoWindowAdapter(GoogleMap map){
