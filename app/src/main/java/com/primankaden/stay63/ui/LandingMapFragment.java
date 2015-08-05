@@ -4,6 +4,7 @@ package com.primankaden.stay63.ui;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.TextView;
 
@@ -12,10 +13,13 @@ import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.primankaden.stay63.R;
+import com.primankaden.stay63.entities.marker.AbsMarker;
 import com.primankaden.stay63.loaders.Loaders;
 import com.primankaden.stay63.loaders.LocalMarkerListLoader;
 
 import org.androidannotations.annotations.EFragment;
+
+import java.util.List;
 
 @EFragment
 public class LandingMapFragment extends AbsMapFragment {
@@ -27,7 +31,7 @@ public class LandingMapFragment extends AbsMapFragment {
     }
 
     @Override
-    protected AsyncTaskLoader getLoader(Bundle args) {
+    protected Loader<List<AbsMarker>> getLoader(Bundle args) {
         return new LocalMarkerListLoader(getActivity(), args);
     }
 
@@ -38,22 +42,13 @@ public class LandingMapFragment extends AbsMapFragment {
 
     @Override
     protected void changeMapSettings(GoogleMap map) {
-        if (map == null) {
-            return;
-        }
+        super.changeMapSettings(map);
         UiSettings sets = map.getUiSettings();
         sets.setScrollGesturesEnabled(false);
         sets.setRotateGesturesEnabled(false);
         sets.setZoomGesturesEnabled(false);
         sets.setZoomControlsEnabled(false);
         sets.setTiltGesturesEnabled(false);
-        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                marker.showInfoWindow();
-                return true;
-            }
-        });
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {

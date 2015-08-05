@@ -11,6 +11,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.primankaden.stay63.bl.GeoBusinessLogic;
 import com.primankaden.stay63.entities.marker.AbsMarker;
 import com.primankaden.stay63.loaders.ParametrizedLoader;
@@ -45,18 +46,29 @@ public abstract class AbsMapFragment extends SupportMapFragment implements OnMap
 
     protected abstract void onLocationChanged(Location location);
 
-    protected abstract void changeMapSettings(GoogleMap map);
-
     protected abstract Bundle prepareLoaderArgs();
 
     protected abstract int getLoaderId();
+
+    protected void changeMapSettings(GoogleMap map){
+        if (map == null) {
+            return;
+        }
+        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                marker.showInfoWindow();
+                return true;
+            }
+        });
+    }
 
     @Override
     public Loader<List<AbsMarker>> onCreateLoader(int i, Bundle bundle) {
         return getLoader(bundle);
     }
 
-    protected abstract AsyncTaskLoader getLoader(Bundle args);
+    protected abstract Loader<List<AbsMarker>> getLoader(Bundle args);
 
     @Override
     public void onLoadFinished(Loader<List<AbsMarker>> loader, List<AbsMarker> absMarkerList) {
