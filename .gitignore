@@ -1,5 +1,6 @@
-/.idea/workspace.xml
-/.idea/libraries
+#android studio
+.idea/
+*.iml
 
 .DS_Store
 /captures
@@ -31,3 +32,9 @@ proguard/
 
 # Log Files
 *.log
+
+#windows thumbnail db
+Thumbs.dp
+
+#osX files
+.DS_Store
