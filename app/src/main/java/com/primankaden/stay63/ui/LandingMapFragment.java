@@ -3,16 +3,11 @@ package com.primankaden.stay63.ui;
 
 import android.location.Location;
 import android.os.Bundle;
-import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
-import android.view.View;
-import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.primankaden.stay63.R;
 import com.primankaden.stay63.entities.marker.AbsMarker;
 import com.primankaden.stay63.loaders.Loaders;
 import com.primankaden.stay63.loaders.LocalMarkerListLoader;
@@ -55,27 +50,10 @@ public class LandingMapFragment extends AbsMapFragment {
                 FullScreenMapActivity.startMe(getActivity());
             }
         });
-        setInfoWindowAdapter(map);
     }
 
     @Override
     protected Bundle prepareLoaderArgs() {
         return LocalMarkerListLoader.prepareArgs(getMap().getProjection().getVisibleRegion().latLngBounds, new Bundle());
-    }
-
-    protected void setInfoWindowAdapter(GoogleMap map) {
-        map.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
-            @Override
-            public View getInfoWindow(Marker marker) {
-                return null;
-            }
-
-            @Override
-            public View getInfoContents(Marker marker) {
-                View v = getActivity().getLayoutInflater().inflate(R.layout.v_map_info_window, null);
-                ((TextView) v.findViewById(R.id.info_text_view)).setText(marker.getTitle());
-                return v;
-            }
-        });
     }
 }
