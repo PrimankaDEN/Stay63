@@ -65,7 +65,7 @@ public class StopBusinessLogic {
         List<FullStop> list = new ArrayList<>();
         String stopsXml;
         try {
-            stopsXml = PublicAPI.getXml(PublicAPI.CLASSIFIER_FULL_STOPS);
+            stopsXml = PublicAPI.getFullStopList();
         } catch (IOException e) {
             Log.w(TAG, "Connection error " + e.getLocalizedMessage());
             return;

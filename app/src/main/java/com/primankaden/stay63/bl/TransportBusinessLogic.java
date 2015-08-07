@@ -45,7 +45,7 @@ public class TransportBusinessLogic {
         }
         String response;
         try {
-            response = PublicAPI.getTransportXml(stopId, 10);
+            response = PublicAPI.getFirstArrivalToStop(stopId, 10);
         } catch (IOException e) {
             Log.w(TAG, e.getLocalizedMessage());
             return;

@@ -3,6 +3,8 @@ package com.primankaden.stay63;
 import android.util.Log;
 
 import java.security.MessageDigest;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Utils {
     private static String convertToHex(byte[] data) {
@@ -29,5 +31,10 @@ public class Utils {
             Log.w("SHA1 Util", e.getLocalizedMessage());
         }
         return result;
+    }
+
+    public static String apiDateFormat(Date day){
+        SimpleDateFormat f = new SimpleDateFormat("dd:MM:yyyy");
+        return f.format(day);
     }
 }
