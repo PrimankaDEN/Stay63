@@ -16,11 +16,6 @@ import java.util.List;
 public class MarkerBusinessLogic {
     private static final int CLUSTER_WIDTH = 5;
     private static final int CLUSTER_HEIGHT = 6;
-    //TODO process dynamically?
-//    private static final double MAX_LATITUDE = 53.5715;
-    private static final double MIN_LATITUDE = 52.9697;
-    //    private static final double MAX_LONGITUDE = 50.5018;
-    private static final double MIN_LONGITUDE = 49.7576;
     private static MarkerBusinessLogic instance;
 
     private MarkerBusinessLogic() {
@@ -47,12 +42,17 @@ public class MarkerBusinessLogic {
         return new ClusterMatrix(list).forScale(scale).asMarkerList();
     }
 
+    /**
+     * Encapsulates clustering algorithms
+     */
     private class ClusterMatrix {
         private final List<? extends AbsPoint> pointsBefore;
-        private SparseArray<SparseArray<ClusterPoint>> matrix;
+        private SparseArray<ClusterPoint> matrix;
+        private int pointsCount;
 
         ClusterMatrix(List<? extends AbsPoint> pointsBefore) {
             this.pointsBefore = pointsBefore;
+            pointsCount = pointsBefore.size();
         }
 
         private void initMatrix() {
@@ -66,17 +66,23 @@ public class MarkerBusinessLogic {
             return 360 * (STEP_IN_DP / worldWideInDP);
         }
 
+        /**
+         * Grid based algorithm
+         */
         ClusterMatrix forScale(double scale) {
             double step = getStep(scale);
             initMatrix();
             for (AbsPoint p : pointsBefore) {
-                int column = (int) ((p.getLongitude() - MIN_LONGITUDE) / step);
-                int line = (int) ((p.getLatitude() - MIN_LATITUDE) / step);
+                int column = (int) (p.getLongitude() / step);
+                int line = (int) (p.getLatitude() / step);
                 addTo(p, line, column);
             }
             return this;
         }
 
+        /**
+         * Grid based algorithm
+         */
         ClusterMatrix betweenCoords(double minLatitude, double maxLatitude, double minLongitude, double maxLongitude) {
             double latStep = (maxLatitude - minLatitude) / CLUSTER_WIDTH;
             double longStep = (maxLongitude - minLongitude) / CLUSTER_HEIGHT;
@@ -88,40 +94,35 @@ public class MarkerBusinessLogic {
             }
             return this;
         }
-
+        
         private void addTo(AbsPoint p, int lineTo, int columnTo) {
-            SparseArray<ClusterPoint> lineMap;
-            if (matrix.get(lineTo) == null) {
-                lineMap = new SparseArray<>();
-                matrix.put(lineTo, lineMap);
-            } else {
-                lineMap = matrix.get(lineTo);
-            }
+            int index = getIndex(lineTo, columnTo);
             ClusterPoint cPoint;
-            if (lineMap.get(columnTo) == null) {
+            if (matrix.get(index) == null) {
                 cPoint = new ClusterPoint();
-                lineMap.put(columnTo, cPoint);
+                matrix.put(index, cPoint);
             } else {
-                cPoint = lineMap.get(columnTo);
+                cPoint = matrix.get(index);
             }
             cPoint.add(p);
         }
 
+        private int getIndex(int line, int column) {
+            return pointsCount * line + column;
+        }
+
         public List<AbsMarker> asMarkerList() {
             List<AbsMarker> result = new ArrayList<>();
-            SparseArray<ClusterPoint> line;
+            ClusterPoint p;
             for (int l = 0; l < matrix.size(); l++) {
-                line = matrix.get(matrix.keyAt(l));
-                for (int c = 0; c < line.size(); c++) {
-                    ClusterPoint p = line.get(line.keyAt(c));
-                    if (p == null || p.isEmpty()) {
-                        continue;
-                    }
-                    if (p.size() < 2) {
-                        result.add(new StopMarker(p.get(0)));
-                    } else {
-                        result.add(new ClusterMarker(p));
-                    }
+                p = matrix.get(matrix.keyAt(l));
+                if (p == null || p.isEmpty()) {
+                    continue;
+                }
+                if (p.size() < 2) {
+                    result.add(new StopMarker(p.get(0)));
+                } else {
+                    result.add(new ClusterMarker(p));
                 }
             }
             return result;
